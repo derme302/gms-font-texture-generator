@@ -826,7 +826,7 @@
       };
       currentX += (checkboxVariableCharacterWidth.checked) ? image.width : fontSize;
       rowWidth = Math.max(rowWidth, currentX);
-      rowHeight = Math.max(rowHeight, image.height);
+      rowHeight = (checkboxVariableCharacterWidth.checked) ? Math.max(rowHeight, image.height) : fontSize + 1;
     }
 
     var height = currentY + rowHeight;
