@@ -148,6 +148,15 @@
         </td>
       </tr>
       <tr>
+        <th>Variable Character width: &nbsp;</th>
+        <td>
+          <label>
+            <input type="checkbox" name="variableCharacter" id="variableCharacterWidth" checked>
+            True &nbsp;
+          </label>
+        </td>
+      </tr>
+      <tr>
         <th>Display type: &nbsp;</th>
         <td>
           <label>
@@ -229,6 +238,7 @@
   var checkboxDisplayTypeNormal = document.getElementById('displayTypeNormal');
   var checkboxFontBold = document.getElementById('fontBold');
   var checkboxFontItalic = document.getElementById('fontItalic');
+  var checkboxVariableCharacterWidth = document.getElementById('variableCharacterWidth');
   var checkboxResolutionPowerOf2 = document.getElementById('resolutionPowerOf2');
   var checkboxResolutionSmallest = document.getElementById('resolutionSmallest');
   var checkboxStrokeJoinMiter = document.getElementById('strokeJoinMiter');
@@ -814,7 +824,7 @@
         x: currentX + padding,
         y: currentY + padding,
       };
-      currentX += image.width;
+      currentX += (checkboxVariableCharacterWidth.checked) ? image.width : fontSize;
       rowWidth = Math.max(rowWidth, currentX);
       rowHeight = Math.max(rowHeight, image.height);
     }
@@ -1131,6 +1141,7 @@
   checkboxDisplayTypeNormal.onchange = updateDisplayType;
   checkboxFontBold.onchange = generate;
   checkboxFontItalic.onchange = generate;
+  checkboxVariableCharacterWidth.onchange = generate;
   checkboxResolutionPowerOf2.onchange = generate;
   checkboxResolutionSmallest.onchange = generate;
   checkboxStrokeJoinMiter.onchange = generate;
