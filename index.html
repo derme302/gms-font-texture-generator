@@ -793,23 +793,16 @@
       coordinates.push(null);
     }
 
-    if (!checkboxVariableCharacterSpacing.checked) {
-      var sorted = images.map(function(image, i) {
+    var sorted = images.map(function(image, i) {
         return {
           index: i,
           width: image.width + 2 * padding,
           height: image.height + 2 * padding,
         };
-      })
-    }
-    else {
-      var sorted = images.map(function(image, i) {
-        return {
-          index: i,
-          width: image.width + 2 * padding,
-          height: image.height + 2 * padding,
-        };
-      }).sort(function(a, b) {      
+    })
+
+    if (checkboxVariableCharacterSpacing.checked) {
+      sorted = sorted.sort(function(a, b) {      
         return b.height - a.height || b.width - a.width;
       });
     }
@@ -1140,7 +1133,7 @@
       textarea.value = "".concat(
         'var string_map = "',
         stringMap,
-        '"\n',
+        '";\n',
         'global.font = font_add_sprite_ext(spr_font, string_map, true, 2);')
     }
 
