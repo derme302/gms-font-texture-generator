@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Font Texture Generator Online</title>
+    <title>Font Texture Generator Online for GameMaker</title>
     <style>
       body, input, textarea {
         font: 14px/20px sans-serif;
@@ -75,7 +75,7 @@
     </style>
   </head>
   <body>
-    <h1>Font Texture Generator Online</h1>
+    <h1>Font Texture Generator Online for GameMaker</h1>
     <p>
       This is a simple utility for generating font textures.
       See <a href="example-webgl/">this example</a> for one way of using the generated font texture.
@@ -131,6 +131,10 @@
             <input type="radio" name="dataFormat" id="dataFormatC">
             C
           </label>
+          <label>
+            <input type="radio" name="dataFormat" id="dataFormatGameMaker">
+            GameMaker
+          </label>
         </td>
       </tr>
       <tr>
@@ -148,10 +152,10 @@
         </td>
       </tr>
       <tr>
-        <th>Variable Character width: &nbsp;</th>
+        <th>Variable Character spacing: &nbsp;</th>
         <td>
           <label>
-            <input type="checkbox" name="variableCharacter" id="variableCharacterWidth" checked>
+            <input type="checkbox" name="variableCharacter" id="variableCharacterSpacing" checked>
             True &nbsp;
           </label>
         </td>
@@ -234,11 +238,12 @@
   var checkboxDataFormatC = document.getElementById('dataFormatC');
   var checkboxDataFormatJSON = document.getElementById('dataFormatJSON');
   var checkboxDataFormatXML = document.getElementById('dataFormatXML');
+  var checkboxDataFormatGameMaker = document.getElementById('dataFormatGameMaker');
   var checkboxDisplayTypeDistanceField = document.getElementById('displayTypeDistanceField');
   var checkboxDisplayTypeNormal = document.getElementById('displayTypeNormal');
   var checkboxFontBold = document.getElementById('fontBold');
   var checkboxFontItalic = document.getElementById('fontItalic');
-  var checkboxVariableCharacterWidth = document.getElementById('variableCharacterWidth');
+  var checkboxVariableCharacterSpacing = document.getElementById('variableCharacterSpacing');
   var checkboxResolutionPowerOf2 = document.getElementById('resolutionPowerOf2');
   var checkboxResolutionSmallest = document.getElementById('resolutionSmallest');
   var checkboxStrokeJoinMiter = document.getElementById('strokeJoinMiter');
@@ -788,15 +793,26 @@
       coordinates.push(null);
     }
 
-    var sorted = images.map(function(image, i) {
-      return {
-        index: i,
-        width: image.width + 2 * padding,
-        height: image.height + 2 * padding,
-      };
-    }).sort(function(a, b) {
-      return b.height - a.height || b.width - a.width;
-    });
+    if (!checkboxVariableCharacterSpacing.checked) {
+      var sorted = images.map(function(image, i) {
+        return {
+          index: i,
+          width: image.width + 2 * padding,
+          height: image.height + 2 * padding,
+        };
+      })
+    }
+    else {
+      var sorted = images.map(function(image, i) {
+        return {
+          index: i,
+          width: image.width + 2 * padding,
+          height: image.height + 2 * padding,
+        };
+      }).sort(function(a, b) {      
+        return b.height - a.height || b.width - a.width;
+      });
+    }
 
     var width = Math.max(maxWidth, Math.ceil(Math.sqrt(totalArea) * 2));
 
@@ -824,9 +840,9 @@
         x: currentX + padding,
         y: currentY + padding,
       };
-      currentX += (checkboxVariableCharacterWidth.checked) ? image.width : fontSize;
+      currentX += (checkboxVariableCharacterSpacing.checked) ? image.width : fontSize;
       rowWidth = Math.max(rowWidth, currentX);
-      rowHeight = (checkboxVariableCharacterWidth.checked) ? Math.max(rowHeight, image.height) : fontSize + 1;
+      rowHeight = (checkboxVariableCharacterSpacing.checked) ? Math.max(rowHeight, image.height) : fontSize;
     }
 
     var height = currentY + rowHeight;
@@ -1112,6 +1128,22 @@
       ]).join('\n');
     }
 
+    else if (checkboxDataFormatGameMaker.checked) {
+      var codePoints = generateCodePoints();
+      var stringMap = codePoints.map(function(codePoint){
+        var char = codePointToString(codePoint);
+        if (char != "") {
+          return char;
+        }
+      }).join("");
+
+      textarea.value = "".concat(
+        'var string_map = "',
+        stringMap,
+        '"\n',
+        'global.font = font_add_sprite_ext(spr_font, string_map, true, 2);')
+    }
+
     var png = canvas.toDataURL();
     buttonDownload.disabled = false;
     buttonDownload.onclick = function() {
@@ -1137,11 +1169,12 @@
   checkboxDataFormatC.onchange = generate;
   checkboxDataFormatJSON.onchange = generate;
   checkboxDataFormatXML.onchange = generate;
+  checkboxDataFormatGameMaker.onchange = generate;
   checkboxDisplayTypeDistanceField.onchange = updateDisplayType;
   checkboxDisplayTypeNormal.onchange = updateDisplayType;
   checkboxFontBold.onchange = generate;
   checkboxFontItalic.onchange = generate;
-  checkboxVariableCharacterWidth.onchange = generate;
+  checkboxVariableCharacterSpacing.onchange = generate;
   checkboxResolutionPowerOf2.onchange = generate;
   checkboxResolutionSmallest.onchange = generate;
   checkboxStrokeJoinMiter.onchange = generate;
