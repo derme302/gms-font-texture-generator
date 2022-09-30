@@ -785,11 +785,13 @@
     var maxWidth = 0;
     var totalArea = 0;
     var coordinates = [];
+    var maxCharacterHeight = 0;
 
     for (var i = 0; i < images.length; i++) {
       var image = images[i];
       maxWidth = Math.max(maxWidth, image.width);
       totalArea += image.width * image.height;
+      maxCharacterHeight = Math.max(maxCharacterHeight, image.height);
       coordinates.push(null);
     }
 
@@ -801,7 +803,7 @@
         };
     })
 
-    if (checkboxVariableCharacterSpacing.checked) {
+    if (!checkboxDataFormatGameMaker.checked) {
       sorted = sorted.sort(function(a, b) {      
         return b.height - a.height || b.width - a.width;
       });
@@ -829,13 +831,19 @@
         currentY += rowHeight;
         rowHeight = 0;
       }
+      
+      var offsetY = 0;
+      if (!checkboxVariableCharacterSpacing.checked) {
+        offsetY = Math.max(0, maxCharacterHeight - image.height);
+      }
+
       coordinates[image.index] = {
         x: currentX + padding,
-        y: currentY + padding,
+        y: currentY + offsetY + padding,
       };
-      currentX += (checkboxVariableCharacterSpacing.checked) ? image.width : fontSize;
+      currentX += (checkboxVariableCharacterSpacing.checked) ? image.width : fontSize + (strokeThickness * 2);
       rowWidth = Math.max(rowWidth, currentX);
-      rowHeight = (checkboxVariableCharacterSpacing.checked) ? Math.max(rowHeight, image.height) : fontSize;
+      rowHeight = (checkboxVariableCharacterSpacing.checked) ? Math.max(rowHeight, image.height) : (fontSize * 2) + (strokeThickness * 2);
     }
 
     var height = currentY + rowHeight;
@@ -1123,6 +1131,7 @@
 
     else if (checkboxDataFormatGameMaker.checked) {
       var codePoints = generateCodePoints();
+      var numOfChars = codePoints.length;
       var stringMap = codePoints.map(function(codePoint){
         var char = codePointToString(codePoint);
         if (char != "") {
@@ -1134,7 +1143,9 @@
         'var string_map = "',
         stringMap,
         '";\n',
-        'global.font = font_add_sprite_ext(spr_font, string_map, true, 2);')
+        'global.font = font_add_sprite_ext(spr_font, string_map, true, 2);',
+        '\n// Grid Size (Assuming Static Spacing): ' + (fontSize + (strokeThickness * 2)) + ', ' + ((fontSize * 2) + (strokeThickness * 2)),
+        '\n// Number of characters: ' + numOfChars)
     }
 
     var png = canvas.toDataURL();
